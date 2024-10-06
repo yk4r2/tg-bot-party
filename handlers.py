@@ -4,6 +4,7 @@ from database import add_or_update_user, get_user, update_user_role, get_all_use
 from utils import send_invitation, send_group_message, export_users_to_excel, send_personal_message
 import logging
 from datetime import datetime
+from config import ADMIN_CHAT_ID
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -87,20 +88,17 @@ async def handle_admin_command(update: Update, context: ContextTypes.DEFAULT_TYP
     else:
         await update.message.reply_text("Неизвестная команда. Доступные команды: invite, group_message, update_role, export_users")
 
-
 async def send_to_admin(context: ContextTypes.DEFAULT_TYPE, user_id: int, username: str, message: str):
-    admin_username = 'yk4r2'  # Replace with the actual admin username
-    admin_user = await context.bot.get_chat(admin_username)
-    if admin_user:
-        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        admin_message = f"{user_id} | {username} | {current_time} | {message}\n"
-        await context.bot.send_message(chat_id=admin_user.id, text=admin_message)
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    admin_message = f"{user_id} | {username} | {current_time} | {message}"
+    await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=admin_message)
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle text messages."""
     user = update.effective_user
     text = update.message.text
     logger.info(f"Received message from {user.username or user.first_name}: {text}")
+    
     await send_to_admin(context, user.id, user.username or user.first_name, text)
     await update.message.reply_text("Спасибо за ваше сообщение. Организаторы свяжутся с вами, если потребуется.")
 

@@ -1,5 +1,5 @@
 import pandas as pd
-from database import get_all_users, get_message_template
+from database import get_all_users, get_message_template, get_user
 
 async def send_invitation(context):
     users = get_all_users()
@@ -14,11 +14,28 @@ async def send_invitation(context):
         message = template.format(username=user.username or user.first_name)
         await context.bot.send_message(chat_id=user.telegram_id, text=message)
 
-async def send_group_message(context, group, message):
+async def send_group_message(context, group, template_name, **kwargs):
     users = get_all_users()
+    template = get_message_template(template_name)
+    if not template:
+        raise ValueError(f"Template '{template_name}' not found")
+    
     for user in users:
-        if user.role == group:
+        if group == 'all' or user.role == group:
+            message = template.format(username=user.username or user.first_name, **kwargs)
             await context.bot.send_message(chat_id=user.telegram_id, text=message)
+
+async def send_personal_message(context, user_id, template_name, **kwargs):
+    user = get_user(user_id)
+    if not user:
+        raise ValueError(f"User with id {user_id} not found")
+    
+    template = get_message_template(template_name)
+    if not template:
+        raise ValueError(f"Template '{template_name}' not found")
+    
+    message = template.format(username=user.username or user.first_name, **kwargs)
+    await context.bot.send_message(chat_id=user.telegram_id, text=message)
 
 def export_users_to_excel():
     users = get_all_users()

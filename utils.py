@@ -8,7 +8,7 @@ async def send_invitation(context):
             template = get_message_template('defender_invitation')
         elif user.role == 'hacker':
             template = get_message_template('hacker_invitation')
-        elif user.role == 'organiezer':
+        elif user.role == 'organizer':
             template = get_message_template('organizer_invitation')
         else:
             template = get_message_template('non_invitation')

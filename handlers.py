@@ -60,6 +60,18 @@ async def handle_admin_command(update: Update, context: ContextTypes.DEFAULT_TYP
     elif command == 'export_users':
         file_path = export_users_to_excel()
         await context.bot.send_document(chat_id=update.effective_chat.id, document=open(file_path, 'rb'))
+    elif command == 'check_support_requests':
+        requests = get_open_support_requests()
+        if requests:
+            message = "Open support requests:\n\n"
+            for req in requests:
+                user = get_user(req.user_id)
+                message += f"User: {user.username or user.first_name}\n"
+                message += f"Request: {req.request_text}\n"
+                message += f"Created at: {req.created_at}\n\n"
+        else:
+            message = "No open support requests."
+        await update.message.reply_text(message)
     else:
         await update.message.reply_text("Неизвестная команда. Доступные команды: invite, group_message, update_role, export_users")
 

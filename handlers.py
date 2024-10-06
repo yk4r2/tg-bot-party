@@ -16,13 +16,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     return NAME
 
 async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Handle the user's name and ask for contact if username is hidden."""
     user = update.effective_user
     name = update.message.text
     first_name, last_name = name.split(maxsplit=1)
     
     if user.username:
-        add_user(user.id, user.username, None, first_name, last_name)
+        add_or_update_user(user.id, user.username, None, first_name, last_name)
         await update.message.reply_text(f"Рады знакомству, {user.username}. Хакерская комиссия рассматривает твою кандидатуру.")
         return ConversationHandler.END
     else:
@@ -31,12 +30,11 @@ async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
         return CONTACT
 
 async def handle_contact(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Handle the user's contact information."""
     user = update.effective_user
     contact = update.message.text
     first_name, last_name = context.user_data['name']
     
-    add_user(user.id, None, contact, first_name, last_name)
+    add_or_update_user(user.id, None, contact, first_name, last_name)
     await update.message.reply_text(f"Рады знакомству, {first_name}. Хакерская комиссия рассматривает твою кандидатуру.")
     return ConversationHandler.END
 

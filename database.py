@@ -2,6 +2,7 @@ import sqlite3
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from config import TEMPLATES
 from datetime import datetime
 
 Base = declarative_base()
@@ -38,8 +39,21 @@ class SupportRequest(Base):
 engine = create_engine('sqlite:///event_bot.db')
 Session = sessionmaker(bind=engine)
 
+def init_message_templates():
+    session = Session()
+    for name, content in TEMPLATES.items():
+        template = session.query(MessageTemplate).filter_by(name=name).first()
+        if template:
+            template.content = content
+        else:
+            template = MessageTemplate(name=name, content=content)
+            session.add(template)
+    session.commit()
+    session.close()
+
 def init_db():
     Base.metadata.create_all(engine)
+    init_message_templates()
 
 def add_or_update_user(telegram_id, username, phone, first_name, last_name):
     session = Session()

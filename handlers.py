@@ -47,6 +47,18 @@ async def handle_admin_command(update: Update, context: ContextTypes.DEFAULT_TYP
         return
 
     command = context.args[0] if context.args else None
+    if command == 'get_messages':
+        messages = get_admin_messages()
+        if messages:
+            response = "Сообщения пользователей:\n\n"
+            for msg in messages:
+                response += f"{msg.username} | {msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')} | {msg.message}\n\n"
+            await update.message.reply_text(response)
+        else:
+            await update.message.reply_text("Нет новых сообщений.")
+    elif command == 'clear_messages':
+        clear_admin_messages()
+        await update.message.reply_text("Все сообщения удалены.")
     if command == 'invite':
         await send_invitation(context)
     elif command == 'group_message':
@@ -86,12 +98,12 @@ async def handle_admin_command(update: Update, context: ContextTypes.DEFAULT_TYP
             message = "No open support requests."
         await update.message.reply_text(message)
     else:
-        await update.message.reply_text("Неизвестная команда. Доступные команды: invite, group_message, update_role, export_users")
+        await update.message.reply_text("Неизвестная команда. Доступные команды: invite, group_message, update_role, export_users, get_messages, clear_messages")
 
-async def send_to_admin(context: ContextTypes.DEFAULT_TYPE, user_id: int, username: str, message: str):
+async def store_admin_message(user_id: int, username: str, message: str):
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     admin_message = f"{user_id} | {username} | {current_time} | {message}"
-    await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=admin_message)
+    add_admin_message(user_id, username, admin_message)
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle text messages."""
@@ -99,7 +111,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     text = update.message.text
     logger.info(f"Received message from {user.username or user.first_name}: {text}")
     
-    await send_to_admin(context, user.id, user.username or user.first_name, text)
+    await store_admin_message(user.id, user.username or user.first_name, text)
     await update.message.reply_text("Спасибо за ваше сообщение. Организаторы свяжутся с вами, если потребуется.")
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

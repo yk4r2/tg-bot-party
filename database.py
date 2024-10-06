@@ -41,6 +41,20 @@ Session = sessionmaker(bind=engine)
 def init_db():
     Base.metadata.create_all(engine)
 
+def add_or_update_user(telegram_id, username, phone, first_name, last_name):
+    session = Session()
+    user = session.query(User).filter_by(telegram_id=telegram_id).first()
+    if user:
+        user.username = username
+        user.phone = phone
+        user.first_name = first_name
+        user.last_name = last_name
+    else:
+        user = User(telegram_id=telegram_id, username=username, phone=phone, first_name=first_name, last_name=last_name)
+        session.add(user)
+    session.commit()
+    session.close()
+
 def add_user(telegram_id, username, phone, first_name, last_name):
     session = Session()
     user = User(telegram_id=telegram_id, username=username, phone=phone, first_name=first_name, last_name=last_name)

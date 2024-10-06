@@ -1,5 +1,5 @@
 import sqlite3
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, ForeignKey, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from config import TEMPLATES
@@ -35,6 +35,15 @@ class SupportRequest(Base):
     request_text = Column(String)
     status = Column(String, default='open')
     created_at = Column(DateTime, default=datetime.utcnow)
+
+class AdminMessage(Base):
+    __tablename__ = 'admin_messages'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, nullable=False)
+    username = Column(String, nullable=False)
+    message = Column(Text, nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow)
 
 engine = create_engine('sqlite:///event_bot.db')
 Session = sessionmaker(bind=engine)
@@ -121,3 +130,23 @@ def get_open_support_requests():
     requests = session.query(SupportRequest).filter_by(status='open').all()
     session.close()
     return requests
+
+def add_admin_message(user_id, username, message):
+    session = Session()
+    admin_message = AdminMessage(user_id=user_id, username=username, message=message)
+    session.add(admin_message)
+    session.commit()
+    session.close()
+
+def get_admin_messages():
+    session = Session()
+    messages = session.query(AdminMessage).order_by(AdminMessage.timestamp.desc()).all()
+    session.close()
+    return messages
+
+def clear_admin_messages():
+    session = Session()
+    session.query(AdminMessage).delete()
+    session.commit()
+    session.close()
+

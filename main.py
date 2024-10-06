@@ -1,7 +1,7 @@
 import logging
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ConversationHandler
 from config import TOKEN
-from handlers import start, handle_name, handle_contact, handle_admin_command, handle_text
+from handlers import start, handle_name, handle_contact, handle_admin_command, handle_text, help_command
 from database import init_db
 
 # Set up logging
@@ -31,6 +31,7 @@ def main():
     # Add handlers
     application.add_handler(conv_handler)
     application.add_handler(CommandHandler('admin', handle_admin_command))
+    application.add_handler(CommandHandler("help", help_command))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 
     # Start the Bot

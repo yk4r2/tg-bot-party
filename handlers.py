@@ -92,3 +92,9 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     text = update.message.text
     logger.info(f"Received message from {user.username}: {text}")
     # Add any additional text handling logic here
+
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user = update.effective_user
+    db_user = get_user(user.id)
+    role = db_user.role if db_user else "Не назначена"
+    await send_personal_message(context, user.id, 'help_message', role=role)

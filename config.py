@@ -12,6 +12,7 @@ DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///event_bot.db')
 
 # Admin username
 ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'yk4r2')
+ADMIN_CHAT_ID = os.getenv('ADMIN_USERNAME', 220115075)
 
 # Event details
 EVENT_DATE = os.getenv('EVENT_DATE', '19 октября')

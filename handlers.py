@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
 from database import add_or_update_user, get_user, update_user_role, get_all_users
-from utils import send_invitation, send_group_message, export_users_to_excel
+from utils import send_invitation, send_group_message, export_users_to_excel, send_group_message, send_personal_message
 import logging
 
 # Set up logging
@@ -39,7 +39,6 @@ async def handle_contact(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     return ConversationHandler.END
 
 async def handle_admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle admin commands."""
     user = update.effective_user
     if user.username != 'yk4r2':  # Replace with actual admin username
         await update.message.reply_text("У вас нет прав для выполнения этой команды.")
@@ -51,7 +50,15 @@ async def handle_admin_command(update: Update, context: ContextTypes.DEFAULT_TYP
     elif command == 'group_message':
         group = context.args[1]
         message = ' '.join(context.args[2:])
-        await send_group_message(context, group, message)
+        await send_group_message(context, group, 'custom_group_message', message=message)
+    elif command == 'preparation_reminder':
+        await send_group_message(context, 'all', 'preparation_reminder')
+    elif command == 'event_start':
+        await send_group_message(context, 'all', 'event_start')
+    elif command == 'victory_announcement':
+        await send_group_message(context, 'all', 'victory_announcement')
+    elif command == 'jam_session':
+        await send_group_message(context, 'all', 'jam_session')
     elif command == 'update_role':
         user_id = int(context.args[1])
         role = context.args[2]
@@ -60,6 +67,10 @@ async def handle_admin_command(update: Update, context: ContextTypes.DEFAULT_TYP
     elif command == 'export_users':
         file_path = export_users_to_excel()
         await context.bot.send_document(chat_id=update.effective_chat.id, document=open(file_path, 'rb'))
+    elif command == 'send_personal':
+        user_id = int(context.args[1])
+        template_name = context.args[2]
+        await send_personal_message(context, user_id, template_name)
     elif command == 'check_support_requests':
         requests = get_open_support_requests()
         if requests:

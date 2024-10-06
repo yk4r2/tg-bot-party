@@ -1,29 +1,40 @@
 import logging
-from telegram import Update
-from telegram.ext import Application, CommandHandler, ChatMemberHandler, MessageHandler, filters
-from config import BOT_TOKEN
-from modules import handlers
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ConversationHandler
+from config import TOKEN
+from handlers import start, handle_name, handle_contact, handle_admin_command, handle_text
+from database import init_db
 
-# Enable logging
-logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
+# Set up logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def main() -> None:
-    application = Application.builder().token(BOT_TOKEN).build()
+# Define conversation states
+NAME, CONTACT = range(2)
 
-    # Command handlers
-    application.add_handler(CommandHandler("start", handlers.start))
-    application.add_handler(CommandHandler("register", handlers.register))
-    application.add_handler(CommandHandler("role", handlers.get_role))
-    application.add_handler(CommandHandler("info", handlers.get_info))
-    application.add_handler(CommandHandler("mission", handlers.get_mission))
+def main():
+    # Initialize the database
+    init_db()
 
-    # Chat member handlers
-    application.add_handler(ChatMemberHandler(handlers.track_chats, ChatMemberHandler.MY_CHAT_MEMBER))
-    application.add_handler(ChatMemberHandler(handlers.greet_chat_members, ChatMemberHandler.CHAT_MEMBER))
+    # Create the Application and pass it your bot's token
+    application = ApplicationBuilder().token(TOKEN).build()
 
-    # Start the bot
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    # Add conversation handler with the states NAME and CONTACT
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler('start', start)],
+        states={
+            NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_name)],
+            CONTACT: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_contact)]
+        },
+        fallbacks=[]
+    )
 
-if __name__ == "__main__":
+    # Add handlers
+    application.add_handler(conv_handler)
+    application.add_handler(CommandHandler('admin', handle_admin_command))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+
+    # Start the Bot
+    application.run_polling()
+
+if __name__ == '__main__':
     main()

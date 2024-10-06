@@ -86,12 +86,22 @@ async def handle_admin_command(update: Update, context: ContextTypes.DEFAULT_TYP
     else:
         await update.message.reply_text("Неизвестная команда. Доступные команды: invite, group_message, update_role, export_users")
 
+
+async def send_to_admin(context: ContextTypes.DEFAULT_TYPE, user_id: int, username: str, message: str):
+    admin_username = 'yk4r2'  # Replace with the actual admin username
+    admin_user = await context.bot.get_chat(admin_username)
+    if admin_user:
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        admin_message = f"{user_id} | {username} | {current_time} | {message}\n"
+        await context.bot.send_message(chat_id=admin_user.id, text=admin_message)
+
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle text messages."""
     user = update.effective_user
     text = update.message.text
-    logger.info(f"Received message from {user.username}: {text}")
-    # Add any additional text handling logic here
+    logger.info(f"Received message from {user.username or user.first_name}: {text}")
+    await send_to_admin(context, user.id, user.username or user.first_name, text)
+    await update.message.reply_text("Спасибо за ваше сообщение. Организаторы свяжутся с вами, если потребуется.")
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user

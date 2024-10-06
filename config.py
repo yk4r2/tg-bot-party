@@ -17,7 +17,7 @@ ADMIN_CHAT_ID = os.getenv('ADMIN_USERNAME', 220115075)
 # Event details
 EVENT_DATE = os.getenv('EVENT_DATE', '19 октября')
 EVENT_TIME = os.getenv('EVENT_TIME', '20:00 по 23:00')
-EVENT_ADDRESS = os.getenv('EVENT_ADDRESS', 'Dance First, Павелецкая (35 зал): https://yandex.lt/maps/-/CDThMYN5')
+EVENT_ADDRESS = os.getenv('EVENT_ADDRESS', 'Dance First, Кожевническая улица, 15с1 (35 зал): https://yandex.lt/maps/-/CDT~QQMf')
 EVENT_CALENDAR_LINK = os.getenv('EVENT_CALENDAR_LINK', 'https://calendar.app.google/cqWteMQQXhgcyhfP6')
 GIFT_CHAT_LINK = os.getenv('GIFT_CHAT_LINK', 'https://t.me/+na5kKl-j-JI1Yjky')
 

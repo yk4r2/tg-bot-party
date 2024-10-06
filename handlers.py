@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
-from database import add_user, get_user, update_user_role, get_all_users
+from database import add_or_update_user, get_user, update_user_role, get_all_users
 from utils import send_invitation, send_group_message, export_users_to_excel
 import logging
 

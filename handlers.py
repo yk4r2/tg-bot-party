@@ -107,5 +107,5 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     db_user = get_user(user.id)
-    role = db_user.role if db_user else "Не назначена"
+    role = db_user.role if db_user in {'hacker', 'defender', 'organizer'} else "Не назначена"
     await send_personal_message(context, user.id, 'help_message', role=role)

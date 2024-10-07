@@ -11,8 +11,9 @@ TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///event_bot.db')
 
 # Admin username
-ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'yk4r2')
-ADMIN_CHAT_ID = os.getenv('ADMIN_USERNAME', 220115075)
+ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'hello_its_me_e')
+ADMIN_CHAT_ID = os.getenv('ADMIN_USERNAME', 5957643313)
+# ADMIN_CHAT_ID = os.getenv('ADMIN_USERNAME', 220115075)
 
 # Event details
 EVENT_DATE = os.getenv('EVENT_DATE', '19 октября')
@@ -31,12 +32,14 @@ TEMPLATES = {
 День Рождения пройдёт {EVENT_DATE} с {EVENT_TIME} по адресу {EVENT_ADDRESS}.
 Ссылка на google calendar: {EVENT_CALENDAR_LINK}.
 Если ты хочешь централизованно что-то подарить, или обсудить идею подарка, вступай в чат: {GIFT_CHAT_LINK}.
+Дресс-код защитников -- киберпанк с рефлективом и светлыми тонами.
 
 В случае если ты не сможешь прийти, обязательно напиши @{ADMIN_USERNAME}, он уберёт тебя из списков.
 
 Хочешь перейти на тёмную сторону силы и помочь хакерам с организацией?
 Пиши @{ADMIN_USERNAME}.''',
     'hacker_invitation': f'''Привет {{username}}. Ты уже знаешь, какова твоя роль, hacker.
+Дресс-код хакеров -- киберпанк с рефлективом и тёмными тонами.
 
 День Рождения пройдёт {EVENT_DATE} с {EVENT_TIME} по адресу {EVENT_ADDRESS}.
 Ссылка на google calendar: {EVENT_CALENDAR_LINK}.
@@ -44,6 +47,7 @@ TEMPLATES = {
 
 Пиши @{ADMIN_USERNAME}, если тебе не написали ранее.''',
     'organizer_invitation': f'''Привет {{username}}. Ты -- organizer.
+Дресс-код организаторов -- киберпанк с рефлективом и светлыми/бирюзовыми тонами.
 
 День Рождения пройдёт {EVENT_DATE} с {EVENT_TIME} по адресу {EVENT_ADDRESS}.
 Ссылка на google calendar: {EVENT_CALENDAR_LINK}.

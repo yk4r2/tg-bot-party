@@ -42,7 +42,7 @@ async def handle_contact(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 async def handle_admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
-    if user.username != 'yk4r2':  # Replace with actual admin username
+    if user.username != ADMIN_USERNAME:  # Replace with actual admin username
         await update.message.reply_text("У вас нет прав для выполнения этой команды.")
         return
 

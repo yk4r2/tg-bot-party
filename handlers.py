@@ -4,7 +4,7 @@ from database import add_or_update_user, get_user, update_user_role, get_all_use
 from utils import send_invitation, send_group_message, export_users_to_excel, send_personal_message
 import logging
 from datetime import datetime
-from config import ADMIN_CHAT_ID
+from config import ADMIN_CHAT_ID, ADMIN_USERNAME
 
 # Set up logging
 logger = logging.getLogger(__name__)

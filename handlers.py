@@ -118,4 +118,5 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     user = update.effective_user
     db_user = get_user(user.id)
     role = db_user.role if db_user in {'hacker', 'defender', 'organizer'} else "Не назначена"
+    print(f"{db_user = }\n{db_user.role = }")
     await send_personal_message(context, user.id, 'help_message', role=role)

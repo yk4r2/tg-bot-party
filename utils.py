@@ -1,5 +1,9 @@
 import pandas as pd
-from database import get_all_users, get_message_template, get_user
+from database import get_all_users, get_message_template, get_user, update_user_role
+from telegram.error import Forbidden
+import logging
+
+logger = logging.getLogger(__name__)
 
 async def send_invitation(context):
     users = get_all_users()
@@ -14,7 +18,13 @@ async def send_invitation(context):
             template = get_message_template('non_invitation')
         
         message = template.format(username=user.username or user.first_name)
-        await context.bot.send_message(chat_id=user.telegram_id, text=message)
+        try:
+            await context.bot.send_message(chat_id=user.telegram_id, text=message)
+        except Forbidden:
+            logger.warning(f"User {user.telegram_id} has blocked the bot. Skipping invitation.")
+            update_user_role(user.telegram_id, 'blocked')
+        except Exception as e:
+            logger.error(f"Error sending invitation to user {user.telegram_id}: {str(e)}")
 
 async def send_group_message(context, group, template_name, **kwargs):
     users = get_all_users()

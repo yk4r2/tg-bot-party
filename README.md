@@ -1,187 +1,100 @@
-# Техническое задание: Телеграм-бот для кибердэнс мастер-класса
+# Cyberpunk Dance Class Telegram Bot
+## What's This All About?
+Imagine organizing a surprise cyberpunk-themed dance class where participants are divided into "hackers" and "defenders". Sounds cool, right? That's exactly what this Telegram bot helps you do! It's your digital assistant for managing registrations, sending out mysterious invitations, and keeping everyone in the loop about this exciting event.
 
-## Обзор
-Нам нужно создать Телеграм-бот для нашего предстоящего кибердэнс мастер-класса. Бот будет регистрировать пользователей, назначать им роли и предоставлять информацию о событии участникам. Бот должен быть простым в реализации, но достаточно надёжным, чтобы справиться примерно с 50 одновременными пользователями.
+## What Can This Bot Do?
+- 📝 Sign up new dance rebels (ahem, participants)
+- 🎭 Assign secret roles: are you a hacker or a defender?
+- 📨 Send out cryptic invitations automatically
+- 🆘 Handle any cries for help (support requests)
+- 👑 Give the event organizer superpowers to manage everything
+- 📊 Create fancy Excel sheets with all the participant data
+- 💬 Send custom messages that fit the cyberpunk theme
+- 🔔 Keep everyone updated about the upcoming dance revolution
 
-## Структура проекта
-Бот будет написан на Python и состоять из нескольких модулей:
+## The Tech Behind the Scenes
+For the curious minds, here's what makes our bot tick:
+
+- Python 3.8+ (the language of the future!)
+- SQLAlchemy (for talking to databases in a cool way)
+- SQLite (our secret data vault)
+- python-telegram-bot (for Telegram wizardry)
+- pandas (not the animal, but for Excel magic)
+
+## Library Structure
+### Bot Architecture Diagram
 
 ```mermaid
 graph TD
-    A[main.py] --> B[config.py]
-    A --> C[handlers.py]
-    A --> D[storage.py]
-    C --> D
-    C --> E[utils.py]
-    F[broadcast.py] --> B
-    F --> D
-
-    style A fill:#ff9999,stroke:#333,stroke-width:2px
-    style B fill:#99ff99,stroke:#333,stroke-width:2px
-    style C fill:#9999ff,stroke:#333,stroke-width:2px
-    style D fill:#ffff99,stroke:#333,stroke-width:2px
-    style E fill:#ff99ff,stroke:#333,stroke-width:2px
-    style F fill:#99ffff,stroke:#333,stroke-width:2px
+    A[User] -->|Interacts| B[Telegram API]
+    B <-->|Sends/Receives Messages| C[Bot Application]
+    C -->|Uses| D[python-telegram-bot library]
+    C -->|Reads/Writes| E[SQLite Database]
+    C -->|Uses| F[SQLAlchemy ORM]
+    C -->|Reads| G[Config File]
+    C -->|Uses| H[Pandas for Excel Export]
+    I[Admin] -->|Manages| C
+    
+    subgraph Bot Application
+        J[app.py]
+        K[handlers.py]
+        L[database.py]
+        M[utils.py]
+    end
 ```
 
-## Описание структуры бота:
-Эта диаграмма показывает, как связаны разные части нашего Телеграм-бота:
-
-1. `main.py` (Красный): Это начальная точка нашего бота. Он использует информацию из config.py и настраивает команды, определенные в handlers.py.
-2. `config.py` (Зеленый): Этот файл содержит важные настройки для бота, например, его секретный токен.
-handlers.py (Синий): Здесь находится код, который определяет, что бот должен делать, когда получает разные команды. Он использует `storage.py` для сохранения или получения информации и `utils.py` для вспомогательных функций.
-3. `storage.py` (Желтый): Здесь мы храним информацию обо всех пользователях и их ролях. И `handlers.py`, и `broadcast.py` используют этот файл для работы с данными пользователей.
-4. `utils.py` (Розовый): Здесь находятся полезные функции, которые использует `handlers.py`, например, для назначения ролей или получения информации о событии.
-5. `broadcast.py` (Голубой): Это отдельный скрипт, который может отправлять сообщения всем пользователям. Ему нужна информация из `config.py`, и он использует `storage.py`, чтобы узнать, кому отправлять сообщения.
-
-Стрелки показывают, какие файлы используют или нуждаются в информации из других файлов. Например, main.py нужна информация из config.py и handlers.py для правильной работы.
-
-## Подробные требования
-### 1. `main.py`
-Это главный файл нашего бота.
-Задачи:
-
-- Подключить нужные модули и настроить бота
-- Определить обработчики команд
-- Запустить бота
-
-Пример структуры:
-```python
-from telegram.ext import Updater, CommandHandler
-from modules import handlers
-from config import BOT_TOKEN
-
-def main():
-    updater = Updater(BOT_TOKEN, use_context=True)
-    dp = updater.dispatcher
-
-    # Добавляем обработчики команд здесь
-    dp.add_handler(CommandHandler("start", handlers.start))
-    # Добавьте больше обработчиков...
-
-    updater.start_polling()
-    updater.idle()
-
-if __name__ == '__main__':
-    main()
-```
-### 2. `config.py`
-Здесь храним настройки.
-Задачи:
-
-- Задать `BOT_TOKEN`
-- Задать путь к файлу `DATA_FILE`
-
-Пример:
-
-```python
-BOT_TOKEN = "ВАШ_ТОКЕН_БОТА"
-DATA_FILE = "data/users.json"
-```
-### 3. `handlers.py`
-Этот модуль будет содержать все функции-обработчики команд.
-Задачи:
-
-- Реализовать обработчики для команд: `/start`, `/register`, `/role`, `/info`, `/mission`
-- Каждый обработчик должен взаимодействовать с `storage.py` для сохранения или получения данных
-
-Пример обработчика:
-
-```python
-from modules import storage, utils
-
-def start(update, context):
-    user_id = update.effective_user.id
-    if storage.user_exists(user_id):
-        update.message.reply_text("С возвращением, оперативник.")
-    else:
-        update.message.reply_text("Приветствую, новобранец. Используй /register для регистрации.")
+## User Flow
+Here's a sneak peek at how our digital dance party is organized:
+```mermaid
+graph TD
+    A[Dance Rebel] -->|Chats with| B[Telegram]
+    B <-->|Sends/Receives Messages| C[Our Awesome Bot]
+    C -->|Uses| D[python-telegram-bot]
+    C -->|Stores/Retrieves Data| E[SQLite Database]
+    C -->|Speaks SQL| F[SQLAlchemy]
+    C -->|Reads| G[Secret Config File]
+    C -->|Creates| H[Excel Sheets]
+    I[Dance Master] -->|Controls| C
 ```
 
-### 4. `storage.py`
-Этот модуль будет отвечать за хранение и получение данных.
-Задачи:
+## Getting the Bot Ready to Dance
 
-- Реализовать функции для сохранения и получения данных пользователей
-- Использовать файловое хранилище (JSON)
-- Реализовать механизм блокировки для обработки одновременного доступа
+- Clone this digital dance floor: `git clone [your-repo-url]`
+- Install the cool gadgets: `pip install -r requirements.txt`
+- Set up your secret codes (environment variables)
+- Initialize the data vault: `python init_db.py`
+- Let the bot loose: `python bot.py`
 
-Основные функции для реализации:
+## How Participants Join the Dance
 
-- `save_user(user_id, role)`
-- `get_user(user_id)`
-- `user_exists(user_id)`
-- `get_all_user_ids()`
+- Scan a mysterious QR code or click a secret link
+- Chat with the bot and share your rebel identity
+- Wait for the Dance Master to assign your role
+- Receive a cryptic invitation
+- Get hyped with event updates and instructions
+- After the dance-off, receive your battle footage
 
-Пример механизма блокировки:
+## For the Dance Master (Admin Powers)
 
-```python
-import json
-import os
-from contextlib import contextmanager
+- Send out invitations to your chosen rebels
+- Decide who's hacking and who's defending
+- Export your rebel database to Excel
+- Send secret messages to specific groups
+- Handle any SOS signals from lost dancers
 
-LOCK_FILE = "data/users.json.lock"
+## SQLite Integration
+The bot application interacts with the SQLite database using SQLAlchemy ORM (Object-Relational Mapping). This integration allows for efficient data management and retrieval.
 
-@contextmanager
-def file_lock():
-    while os.path.exists(LOCK_FILE):
-        time.sleep(0.1)
-    try:
-        open(LOCK_FILE, 'w').close()
-        yield
-    finally:
-        if os.path.exists(LOCK_FILE):
-            os.remove(LOCK_FILE)
+Here's how it works:
 
-def save_user(user_id, role):
-    with file_lock():
-        # Загрузить существующие данные, обновить и сохранить
-```
-
-### 5. `utils.py`
-Этот модуль будет содержать вспомогательные функции.
-Задачи:
-
-- Реализовать функцию назначения роли
-- Реализовать функции для генерации информации о событии и заданиях
-
-Пример:
-
-```python
-import random
-
-def assign_role():
-    return random.choice(["Хакер", "Защитник"])
-
-def get_event_info():
-    return "Кибердэнс мастер-класс: Дата будет объявлена, Место: Засекречено"
-```
-### 6. `broadcast.py`
-Этот скрипт позволит отправлять сообщения всем пользователям из командной строки.
-Задачи:
-
-- Реализовать функцию для отправки сообщения всем зарегистрированным пользователям
-- Принимать сообщение как аргумент командной строки
-
-Пример использования:
-
-```bash
-python broadcast.py defenders "Событие начинается через 1 час. Подготовьте свои нейроинтерфейсы!"
-```
-### Тестирование
-
-- Проверьте каждую команду, чтобы убедиться, что она работает как ожидается
-- Протестируйте одновременный доступ, чтобы проверить работу механизма блокировки
-- Проверьте функцию рассылки
-
-### Развертывание
-
-- Убедитесь, что все зависимости установлены (библиотека `python-telegram-bot`)
-- Настройте токен бота в `config.py`
-- Запустите `main.py`, чтобы запустить бота
-
-### Дополнительные заметки
-
-- Следуйте руководству по стилю [PEP 8](https://peps.python.org/pep-0008/)
-- Комментируйте свой код для ясности
-- Аккуратно обрабатывайте исключения
+1. Database Connection: The bot establishes a connection to the SQLite database using SQLAlchemy's create_engine function.
+1. ORM Models: We define Python classes that represent database tables (`User`, `MessageTemplate`, `SupportRequest`, `AdminMessage`). These classes inherit from SQLAlchemy's declarative_base().
+1. Session Management: SQLAlchemy sessions are used to manage database transactions. We use a sessionmaker to create sessions as needed.
+1. CRUD Operations: The bot performs `Create`, `Read`, `Update`, and `Delete` operations on the database using SQLAlchemy's ORM methods. For example:
+    - Creating a new user: `session.add(User(...))`
+    - Querying users: `session.query(User).filter_by(...).first()`
+    - Updating user roles: `user.role = new_role`
+    - Deleting records: `session.delete(user)`
+1. Transaction Handling: SQLAlchemy manages transactions, ensuring data integrity. We use `session.commit()` to save changes and `session.rollback()` in case of errors.
+1. Connection Pooling: SQLAlchemy handles connection pooling automatically, optimizing database access.
+1. SQL Generation: While we primarily use ORM methods, SQLAlchemy can also generate raw SQL when needed, as demonstrated in our role update function.

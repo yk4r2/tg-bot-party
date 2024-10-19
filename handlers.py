@@ -102,7 +102,7 @@ async def handle_admin_command(update: Update, context: ContextTypes.DEFAULT_TYP
             message = "No open support requests."
         await update.message.reply_text(message)
     else:
-        await update.message.reply_text("Неизвестная команда. Доступные команды: invite, group_message, update_role, export_users, get_messages, clear_messages, send_personal, check_support_requests")
+        await update.message.reply_text("Неизвестная команда. Доступные команды: invite, group_message, update_role, export_users, get_messages, clear_messages, send_personal, check_support_requests, template_group_message")
 
 async def store_admin_message(user_id: int, username: str, message: str):
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

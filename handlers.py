@@ -61,6 +61,10 @@ async def handle_admin_command(update: Update, context: ContextTypes.DEFAULT_TYP
         await update.message.reply_text("Все сообщения удалены.")
     elif command == 'invite':
         await send_invitation(context)
+    elif command == 'template_group_message':
+        group = context.args[1]
+        template_name = 'context.args[2]
+        await send_group_message(context, group, template_name)
     elif command == 'group_message':
         group = context.args[1]
         message = ' '.join(context.args[2:])
